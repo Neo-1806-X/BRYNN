@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Least privilege: CI only needs to read the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # Actions are pinned to major tags for now; pin to commit SHAs at M0.5 (KI-002 in PROJECT_LEDGER.md).
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: apps/api/go.mod
+          cache: false
+
+      - name: Quality gate (gofmt, go vet, race-enabled tests)
+        run: sh scripts/check-go.sh
+
+      - name: Container image builds
+        run: docker build --tag brynn-api:ci apps/api

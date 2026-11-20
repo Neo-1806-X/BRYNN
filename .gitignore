@@ -1,0 +1,25 @@
+# Secrets and local configuration: never commit these.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+
+# Build output and caches
+bin/
+dist/
+build/
+tmp/
+coverage.out
+node_modules/
+target/
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

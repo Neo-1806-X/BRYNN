@@ -1,0 +1,30 @@
+name: brynn
+
+services:
+  api:
+    build:
+      context: ./apps/api
+      args:
+        VERSION: ${BRYNN_VERSION:-dev}
+        COMMIT: ${BRYNN_COMMIT:-unknown}
+    environment:
+      BRYNN_ENV: development
+      BRYNN_HTTP_ADDR: ":8080"
+      BRYNN_LOG_LEVEL: debug
+    # Published on the host loopback only: nothing on your network can reach it.
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "/api", "healthcheck"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    # Must exceed BRYNN_DRAIN_DELAY (5s) + BRYNN_SHUTDOWN_TIMEOUT (25s).
+    stop_grace_period: 40s
